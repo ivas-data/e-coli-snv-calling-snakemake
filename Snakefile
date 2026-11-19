@@ -28,8 +28,10 @@ rule map_reads:
         r2="data/reads/SRR2589044_2.trim.sub.fastq"
     output:
         "results/SRR2589044.sam"
+    log:
+        "logs/SRR2589044.bwa.log"
     shell:
-        "bwa mem {input.reference:q} {input.r1:q} {input.r2:q} > {output:q}"
+        "bwa mem {input.reference:q} {input.r1:q} {input.r2:q} > {output:q} 2> {log:q}"
 
 rule sort_bam: 
     input: 
@@ -46,5 +48,5 @@ rule index_bam:
         "results/SRR2589044.sorted.bam.bai"
     shell:
         "samtools index {input:q} {output:q}"
-        
+
 
