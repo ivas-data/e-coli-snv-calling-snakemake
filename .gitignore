@@ -1,0 +1,6 @@
+/data/
+/.snakemake/
+/results/
+/logs/
+/greeting.txt
+/count_words.txt
