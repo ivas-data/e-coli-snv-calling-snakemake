@@ -20,9 +20,31 @@ rule index_reference:
         "bwa index {input:q}"
 
 
+rule map_reads:
+    input:
+        reference="data/reference/REL606.fasta",
+        index=rules.index_reference.output,
+        r1="data/reads/SRR2589044_1.trim.sub.fastq",
+        r2="data/reads/SRR2589044_2.trim.sub.fastq"
+    output:
+        "results/SRR2589044.sam"
+    shell:
+        "bwa mem {input.reference:q} {input.r1:q} {input.r2:q} > {output:q}"
 
+rule sort_bam: 
+    input: 
+        "results/SRR2589044.sam"
+    output:
+        "results/SRR2589044.sorted.bam"
+    shell: 
+        "samtools sort -o {output:q} {input:q}"
 
-
-
-
+rule index_bam:
+    input: 
+        "results/SRR2589044.sorted.bam"
+    output:
+        "results/SRR2589044.sorted.bam.bai"
+    shell:
+        "samtools index {input:q} {output:q}"
+        
 
