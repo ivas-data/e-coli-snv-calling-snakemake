@@ -16,9 +16,10 @@ rule index_reference:
         "data/reference/REL606.fasta.bwt",
         "data/reference/REL606.fasta.pac",
         "data/reference/REL606.fasta.sa"
+    log:
+        "logs/REL606.index_reference.log"
     shell:
-        "bwa index {input:q}"
-
+        "bwa index {input:q} 2> {log:q}"
 
 rule map_reads:
     input:
@@ -38,15 +39,19 @@ rule sort_bam:
         "results/SRR2589044.sam"
     output:
         "results/SRR2589044.sorted.bam"
+    log:
+        "logs/SRR2589044.sort_bam.log"
     shell: 
-        "samtools sort -o {output:q} {input:q}"
+        "samtools sort -o {output:q} {input:q} 2> {log:q}"
 
 rule index_bam:
     input: 
         "results/SRR2589044.sorted.bam"
     output:
         "results/SRR2589044.sorted.bam.bai"
+    log:
+        "logs/SRR2589044.index_bam.log"
     shell:
-        "samtools index {input:q} {output:q}"
+        "samtools index {input:q} {output:q} 2> {log:q}"
 
 
