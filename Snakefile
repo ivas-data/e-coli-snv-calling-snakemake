@@ -54,4 +54,31 @@ rule index_bam:
     shell:
         "samtools index {input:q} {output:q} 2> {log:q}"
 
+# I index the reference so bcftools can look up bases by position.
+rule index_fasta:
+    input:
+        "data/reference/REL606.fasta"
+    output:
+        "data/reference/REL606.fasta.fai"
+    log:
+        "logs/REL606.index_fasta.log"
+    shell:
+        "samtools faidx {input:q} 2> {log:q}"
+
+# I compare the sample's reads with the REL606 reference and save the detected variants in a VCF file.
+rule call_variants:
+    input:
+        bam="results/SRR2589044.sorted.bam",
+        bai="results/SRR2589044.sorted.bam.bai",
+        ref="data/reference/REL606.fasta",
+        fai="data/reference/REL606.fasta.fai"
+    output:
+        "results/SRR2589044.vcf"
+    log:
+        "logs/SRR2589044.variant_calling.log"
+    shell:
+        """
+        (bcftools mpileup -Ou -f {input.ref:q} {input.bam:q} |
+         bcftools call --ploidy 1 -m -v -Ov -o {output:q}) 2> {log:q}
+        """
 

@@ -6,3 +6,4 @@ dependencies:
   - snakemake=9.27.1
   - bwa=0.7.19
   - samtools
+  - bcftools=1.25
