@@ -1,0 +1,7 @@
+samples:
+  - SRR2589044
+  - SRR2584866
+
+variant_filter:
+  min_qual: 20
+  min_dp: 5

@@ -1,3 +1,12 @@
+configfile: "config/config.yaml"
+
+wildcard_constraints:
+    sample=r"SRR[0-9]+"
+
+rule all:
+    input:
+        expand("results/{sample}.snvs.vcf", sample=config["samples"])
+
 rule greeting:
     output: "greeting.txt"
     shell: "echo 'Snakemake works!' > {output:q}"
@@ -25,32 +34,32 @@ rule map_reads:
     input:
         reference="data/reference/REL606.fasta",
         index=rules.index_reference.output,
-        r1="data/reads/SRR2589044_1.trim.sub.fastq",
-        r2="data/reads/SRR2589044_2.trim.sub.fastq"
+        r1="data/reads/{sample}_1.trim.sub.fastq",
+        r2="data/reads/{sample}_2.trim.sub.fastq"
     output:
-        "results/SRR2589044.sam"
+        "results/{sample}.sam"
     log:
-        "logs/SRR2589044.bwa.log"
+        "logs/{sample}.bwa.log"
     shell:
         "bwa mem {input.reference:q} {input.r1:q} {input.r2:q} > {output:q} 2> {log:q}"
 
 rule sort_bam: 
     input: 
-        "results/SRR2589044.sam"
+        "results/{sample}.sam"
     output:
-        "results/SRR2589044.sorted.bam"
+        "results/{sample}.sorted.bam"
     log:
-        "logs/SRR2589044.sort_bam.log"
+        "logs/{sample}.sort_bam.log"
     shell: 
         "samtools sort -o {output:q} {input:q} 2> {log:q}"
 
 rule index_bam:
     input: 
-        "results/SRR2589044.sorted.bam"
+        "results/{sample}.sorted.bam"
     output:
-        "results/SRR2589044.sorted.bam.bai"
+        "results/{sample}.sorted.bam.bai"
     log:
-        "logs/SRR2589044.index_bam.log"
+        "logs/{sample}.index_bam.log"
     shell:
         "samtools index {input:q} {output:q} 2> {log:q}"
 
@@ -69,14 +78,14 @@ rule index_fasta:
 # I compare the sample's reads with the REL606 reference and save the detected variants in a VCF file.
 rule call_variants:
     input:
-        bam="results/SRR2589044.sorted.bam",
-        bai="results/SRR2589044.sorted.bam.bai",
+        bam="results/{sample}.sorted.bam",
+        bai="results/{sample}.sorted.bam.bai",
         ref="data/reference/REL606.fasta",
         fai="data/reference/REL606.fasta.fai"
     output:
-        "results/SRR2589044.vcf"
+        "results/{sample}.vcf"
     log:
-        "logs/SRR2589044.variant_calling.log"
+        "logs/{sample}.variant_calling.log"
     shell:
         """
         (bcftools mpileup -Ou -f {input.ref:q} {input.bam:q} |
@@ -86,13 +95,20 @@ rule call_variants:
 # I use Snakemake to filter the original Variant Call Format (VCF) file and save the single-nucleotide variants (SNVs) that pass the filters.
 rule filter_variants:
     input:
-        "results/SRR2589044.vcf"            
+        "results/{sample}.vcf"
     output:
-        "results/SRR2589044.snvs.vcf"
+        "results/{sample}.snvs.vcf"
     log:
-        "logs/SRR2589044.filter_variants.log"
+        "logs/{sample}.filter_variants.log"
+    params:
+        min_qual=config["variant_filter"]["min_qual"],
+        min_dp=config["variant_filter"]["min_dp"]
     shell:
-        """
-        bcftools view -i 'TYPE="snp" && QUAL>=20 && INFO/DP>=5' \
+         """
+        bcftools view -i 'TYPE="snp" && QUAL>={params.min_qual} && INFO/DP>={params.min_dp}' \
             -Ov -o {output:q} {input:q} 2> {log:q}
         """
+
+
+
+
