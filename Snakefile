@@ -54,6 +54,7 @@ rule index_bam:
     shell:
         "samtools index {input:q} {output:q} 2> {log:q}"
 
+
 # I index the reference so bcftools can look up bases by position.
 rule index_fasta:
     input:
@@ -82,3 +83,16 @@ rule call_variants:
          bcftools call --ploidy 1 -m -v -Ov -o {output:q}) 2> {log:q}
         """
 
+# I use Snakemake to filter the original Variant Call Format (VCF) file and save the single-nucleotide variants (SNVs) that pass the filters.
+rule filter_variants:
+    input:
+        "results/SRR2589044.vcf"            
+    output:
+        "results/SRR2589044.snvs.vcf"
+    log:
+        "logs/SRR2589044.filter_variants.log"
+    shell:
+        """
+        bcftools view -i 'TYPE="snp" && QUAL>=20 && INFO/DP>=5' \
+            -Ov -o {output:q} {input:q} 2> {log:q}
+        """
