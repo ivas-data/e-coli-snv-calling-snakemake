@@ -40,8 +40,9 @@ rule map_reads:
         "results/{sample}.sam"
     log:
         "logs/{sample}.bwa.log"
+    threads: config["resources"]["mapping_threads"]
     shell:
-        "bwa mem {input.reference:q} {input.r1:q} {input.r2:q} > {output:q} 2> {log:q}"
+        "bwa mem -t {threads} {input.reference:q} {input.r1:q} {input.r2:q} > {output:q} 2> {log:q}"
 
 rule sort_bam: 
     input: 

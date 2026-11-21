@@ -5,3 +5,6 @@ samples:
 variant_filter:
   min_qual: 20
   min_dp: 5
+
+resources:
+  mapping_threads: 1
