@@ -102,6 +102,8 @@ We obtained the mapping statistics with `samtools flagstat`.
 | `SRR2584866` | 50,000 | 99.98% | 99.05% | 629 |
 Among the three samples, the one from generation 50,000 had the highest number of detected SNVs relative to the REL606 reference genome.
 
+The [example outputs](example-output/) include the filtered VCF files for all three samples and the corresponding Snakemake rule logs.
+
 ## Software versions
 
 | Tool | Version used |
