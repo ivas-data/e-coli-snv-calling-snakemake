@@ -54,6 +54,7 @@ The environment includes **Snakemake, BWA, SAMtools and BCFtools** for running t
 ## Running the Workflow
 
 ### Prepare the input files
+The input files are already included in `data/`. Follow the steps below only if you want to download them again.
 From the project directory, create the input directories, then download and extract the paired-end reads.
 
 ```bash
